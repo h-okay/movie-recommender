@@ -3,8 +3,6 @@ import pandas as pd
 import requests
 import streamlit as st
 
-from creds import api_key
-
 
 @st.cache(show_spinner=False)
 def import_data():
@@ -223,6 +221,7 @@ def posters(id_list_):
     paths: list
         List containing poster paths.
     """
+    api_key = st.secrets['api_key']
     paths = []
     for _ in id_list_:
         try:
