@@ -1,4 +1,5 @@
 import gc
+
 import pandas as pd
 import requests
 import streamlit as st
@@ -20,10 +21,10 @@ def import_data():
         Dataframe contains data from link.pkl
     """
     gc.disable()
-    link_ = pd.read_parquet("data/link.parquet")
-    movie_ = pd.read_parquet("data/movie.parquet")
-    rating_ = pd.read_parquet("data/rating.parquet")
-    user_movie_df_ = pd.read_parquet("data/user_movie_df.parquet")
+    link_ = pd.read_parquet("data/link.parquet.gzip")
+    movie_ = pd.read_parquet("data/movie.parquet.gzip")
+    rating_ = pd.read_parquet("data/rating.parquet.gzip")
+    user_movie_df_ = pd.read_parquet("data/user_movie_df.parquet.gzip")
     gc.enable()
     return movie_, rating_, user_movie_df_, link_
 
@@ -221,7 +222,7 @@ def posters(id_list_):
     paths: list
         List containing poster paths.
     """
-    api_key = st.secrets['api_key']
+    api_key = st.secrets["api_key"]
     paths = []
     for _ in id_list_:
         try:
