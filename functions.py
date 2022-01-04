@@ -21,15 +21,14 @@ def import_data():
         Dataframe contains data from link.pkl
     """
     gc.disable()
-    link_ = pd.read_parquet("data/link.parquet.gzip")
-    movie_ = pd.read_parquet("data/movie.parquet.gzip")
-    rating_ = pd.read_parquet("data/rating.parquet.gzip")
-    user_movie_df_ = pd.read_parquet("data/user_movie_df.parquet.gzip")
+    link_ = pd.read_parquet("data/link.parquet")
+    movie_ = pd.read_parquet("data/movie.parquet")
+    rating_ = pd.read_parquet("data/rating.parquet")
+    user_movie_df_ = pd.read_parquet("data/user_movie_df.parquet")
     gc.enable()
     return movie_, rating_, user_movie_df_, link_
 
 
-@st.cache(show_spinner=False)
 def give_me_recommendations(movie_, rating_, user_movie_df_, id_: int):
     """
     Returns movie IDs based on User-based and Item-based recommendation.
@@ -115,17 +114,17 @@ def give_me_recommendations(movie_, rating_, user_movie_df_, id_: int):
         "title"]
 
     ###########################################################################
-
-    movie_id = (
-        rating_[
-            (rating_["userId"] == id_) & (
-                        rating_["rating"] == rating_["rating"].max())
-            ]
-            .sort_values("timestamp", ascending=False)["movieId"][:1]
-            .values[0]
-    )
-
     try:
+        movie_id = (
+            rating_[
+                (rating_["userId"] == id_) & (
+                            rating_["rating"] == rating_["rating"].max())
+                ]
+                .sort_values("timestamp", ascending=False)["movieId"][:1]
+                .values[0]
+        )
+
+
         movie_name = user_movie_df_[
             movie_[movie_.movieId == movie_id].title.values[0]]
 
@@ -135,7 +134,15 @@ def give_me_recommendations(movie_, rating_, user_movie_df_, id_: int):
                 .iloc[:6]
                 .iloc[1:]
         )
-    except KeyError:
+    except (KeyError, IndexError):
+        movie_id = (
+            rating_[
+                (rating_["userId"] == id_) & (
+                        rating_["rating"] == rating_["rating"].max())
+                ]
+                .sort_values("timestamp", ascending=False)["movieId"][1:2]
+                .values[0]
+        )
         movie_id = (
             rating_[
                 (rating_["userId"] == id_)
@@ -157,7 +164,6 @@ def give_me_recommendations(movie_, rating_, user_movie_df_, id_: int):
     return user_5_, item_5_
 
 
-@st.cache(show_spinner=False)
 def id_generator(top5user, top5item, movie_df_, link_df_):
     """
     Generate TMDB ID's and titles.
@@ -209,7 +215,6 @@ def id_generator(top5user, top5item, movie_df_, link_df_):
     )
 
 
-@st.cache(show_spinner=False)
 def posters(id_list_):
     """
     Generates poster paths for TMDB API.
