@@ -1,2 +1,3 @@
-# hybrid_recommender
- Hybrid (User&Item Based) Movie Recommender
+# Movie Recommender
+
+ Interface for hybrid (User & Item Based) movie recommender system 
